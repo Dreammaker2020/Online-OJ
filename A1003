@@ -1,0 +1,56 @@
+#include <iostream>
+#include <vector>
+#include <cstring>
+using namespace std;
+const int MAXV=520;
+const int INF=0x7fffffff;
+int G[MAXV][MAXV],weight[MAXV],d[MAXV],w[MAXV],num[MAXV];
+int n,m,st,ed,a,b,dis;
+bool vist[MAXV]= {false};
+void Dijkstra(int s) {//起点
+	fill(d,d+MAXV,INF);
+	fill(w,w+MAXV,0);
+	fill(num,num+MAXV,0);
+	num[s]=1;
+	d[s]=0;
+	w[s]=weight[s];
+	for(int i=0; i<n; i++) {
+		int u=-1,MIN=INF;
+		for(int j=0; j<n; j++) {
+			if(!vist[j]&&d[j]<MIN) {
+				MIN=d[j];
+				u=j;
+			}
+		}
+		if(u==-1) return;
+		vist[u]=true;
+		for(int v=0; v<n; v++) {
+			if(!vist[v]&&G[u][v]!=INF) {
+				if(d[u]+G[u][v]<d[v]) {
+					d[v]=d[u]+G[u][v];
+					w[v]=w[u]+weight[v];
+					num[v]=num[u];
+				} else if(d[u]+G[u][v]==d[v]) {
+					num[v]+=num[u];
+					if(w[u]+weight[v]>w[v]) {
+						w[v]=w[u]+weight[v];
+					}
+				}
+			}
+		}
+	}
+}
+int main() {
+	scanf("%d%d%d%d",&n,&m,&st,&ed);
+	fill(G[0],G[0]+MAXV*MAXV,INF);
+	for(int i=0; i<n; i++) {
+		scanf("%d",&weight[i]);//点权
+	}
+	for(int i=0; i<m; i++) {
+		scanf("%d%d%d",&a,&b,&dis);
+		G[a][b]=G[b][a]=dis;
+	}
+	Dijkstra(st);
+	printf("%d %d\n",num[ed],w[ed]);
+	return 0;
+}
