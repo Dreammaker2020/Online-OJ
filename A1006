@@ -1,0 +1,36 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+using namespace std;
+struct node {
+	char id[18];
+	int sign_time,off_time;
+};//结构体保存ID_number  登入和登出信息
+int cal(int hh,int mm,int ss) {
+	return hh*60*60+mm*60+ss;//把所有时间转换为秒的形式
+}
+bool cmp(node a,node b) {
+	return a.sign_time<b.sign_time;
+}
+bool cmp2(node a,node b) {
+	return a.off_time>b.off_time;
+}
+int main() {
+	int m,hh,mm,ss,t;
+	scanf("%d",&m);
+	vector<node> ans(m);
+	for(int i=0; i<m; i++) {
+		scanf("%s",&ans[i]);
+		scanf("%d:%d:%d",&hh,&mm,&ss);
+		t=cal(hh,mm,ss);
+		ans[i].sign_time=t;
+		scanf("%d:%d:%d",&hh,&mm,&ss);
+		t=cal(hh,mm,ss);
+		ans[i].off_time=t;
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	printf("%s ",ans[0].id);
+	sort(ans.begin(),ans.end(),cmp2);
+	printf("%s\n",ans[0].id);
+	return 0;
+}
