@@ -1,0 +1,93 @@
+#include <iostream>
+#include <algorithm>
+#include <vector>
+using namespace std;
+const int MAXV=520;
+const int INF=0x3fffffff;
+int Cmax,n,sp,m,G[MAXV][MAXV],a,b,val,weight[MAXV],d[MAXV];
+bool vist[MAXV]= {false};
+vector<int> pre[MAXV];//用来保存多条最短的路径中 每一个结点的前序的结点（会有多个）
+vector<int> tempPath,ansPath;
+void Dijkstra(int s) {//先用Dijkstra算法求出最短路径
+	fill(d,d+MAXV,INF);
+	d[s]=0;
+	for(int i=0; i<=n; i++) {
+		int u=-1,MIN=INF;
+		for(int j=0; j<=n; j++) {
+			if(!vist[j]&&d[j]<MIN) {
+				MIN=d[j];
+				u=j;
+			}
+		}
+		if(u==-1) return;//图不连通的时候 结束Dijkstra
+		vist[u]=true;//访问顶点
+		for(int v=0; v<=n; v++) {
+			if(!vist[v]&&G[u][v]!=INF) {
+				if(d[u]+G[u][v]<d[v]) {
+					d[v]=d[u]+G[u][v];
+					pre[v].clear();//出现更短路径 清除当前结点V之前保存的前一些结点
+					pre[v].push_back(u);//保存前序结点
+				} else if(d[u]+G[u][v]==d[v]) {
+					pre[v].push_back(u);
+				}
+			}
+		}
+	}
+}
+int minSent=INF,minTackBack=INF;
+void DFS(int v) {
+	if(v==0) {
+		int sent=0,tackBack=0;
+		tempPath.push_back(v);
+		for(int i=tempPath.size()-2; i>=0; i--) {//去除0位置的P
+			int id=tempPath[i];
+			if(weight[id]>0) {//站点车辆数大于Cmax的一半
+				tackBack+=weight[id];
+			} else if(weight[id]<0) { //站点缺少车
+				if(abs(weight[id])<=tackBack) {//收集的车辆可以补该车站少的车
+					tackBack-=abs(weight[id]);
+				} else {//不够
+					sent+=abs(weight[id])-tackBack;
+					tackBack=0;
+				}
+			}
+		}
+		if(sent<minSent) {
+			minSent=sent;
+			minTackBack=tackBack;
+			ansPath=tempPath;
+		} else if(sent==minSent&&tackBack<minTackBack) {//如果公共车站要出发带出的车数一样少的时候  找出要带回车辆最少的一条路径
+			minTackBack=tackBack;
+			ansPath=tempPath;
+		}
+		tempPath.pop_back();
+		return;
+	}
+	tempPath.push_back(v);
+	for(int i=0; i<pre[v].size(); i++) {
+		DFS(pre[v][i]);
+	}
+	tempPath.pop_back();
+}
+int main() {
+	fill(G[0],G[0]+MAXV*MAXV,INF);
+	scanf("%d%d%d%d",&Cmax,&n,&sp,&m);
+	for(int i=1; i<=n; i++) {
+		scanf("%d",&val);
+		weight[i]=val-Cmax/2;
+	}
+	for(int i=0; i<m; i++) {
+		scanf("%d%d",&a,&b);
+		scanf("%d",&G[a][b]);
+		G[b][a]=G[a][b];
+	}
+	Dijkstra(0);
+	DFS(sp);
+	printf("%d ",minSent);
+	for(int i=ansPath.size()-1; i>=0; i--) {
+		printf("%d",ansPath[i]);
+		if(i>0) printf("->");
+	}
+	printf(" %d\n",minTackBack);
+	return 0;
+}
