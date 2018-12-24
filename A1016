@@ -1,0 +1,65 @@
+#include <iostream>
+#include <algorithm>
+#include <map>
+#include <cstring>
+#include <vector>
+using namespace std;
+const int MAXN=1010;
+int rate[25]= {0};
+struct Record {
+	string name;
+	int MM,DD,HH,minute,status,times;//status若为1:on-line若为0:off-line  times计算通话时间总和     
+} rd[MAXN];
+bool cmp(Record a,Record b) {
+	if(a.name!=b.name) return a.name<b.name;
+	else return a.times<b.times;
+}
+double getBill(Record r,int *rate) {
+	double total=r.DD*60*rate[24];//计算从00:00:00:00到记录这一天的总花费 
+	for(int i=0; i<r.HH; i++) {
+		total+=rate[i]*60;
+	}
+	total+=rate[r.HH]*r.minute;
+	return total/100.0;
+}
+int main() {
+	for(int i=0; i<24; i++) {
+		scanf("%d",&rate[i]);
+		rate[24]+=rate[i];
+	}
+	int n;
+	string s;
+	scanf("%d",&n);
+	for(int i=0; i<n; i++) {
+		cin>>rd[i].name;
+		scanf("%d:%d:%d:%d",&rd[i].MM,&rd[i].DD,&rd[i].HH,&rd[i].minute);
+		cin>>s;
+		if(s=="on-line") rd[i].status=1;
+		else rd[i].status=0;
+		rd[i].times=rd[i].DD*24*60+rd[i].HH*60+rd[i].minute;
+	}
+	sort(rd,rd+n,cmp);
+	map<string,vector<Record>> custom;
+	for(int i=1; i<n; i++) {
+		if(rd[i].name==rd[i-1].name&&rd[i-1].status==1&&rd[i].status==0) {//如果前后2条记录为on-line和off-line则保存有效记录 否则丢弃无效记录
+			custom[rd[i].name].push_back(rd[i-1]);
+			custom[rd[i].name].push_back(rd[i]);
+		}
+	}
+	for(map<string,vector<Record>>::iterator it=custom.begin(); it!=custom.end(); it++) {
+		vector<Record> res=it->second;
+		cout<<it->first<<" ";
+		printf("%02d\n",res[0].MM);
+		double total=0;
+		for(int i=1; i<res.size(); i+=2) {
+			double b1=getBill(res[i-1],rate);
+			double b2=getBill(res[i],rate);
+			double t=b2-b1;//最终的消费
+			printf("%02d:%02d:%02d %02d:%02d:%02d %d $%.2f\n",res[i-1].DD,res[i-1].HH,res[i-1].minute,
+			       res[i].DD,res[i].HH,res[i].minute,res[i].times-res[i-1].times,t);
+			total+=t;
+		}
+		printf("Total amount: $%.2f\n",total);
+	}
+	return 0;
+}
