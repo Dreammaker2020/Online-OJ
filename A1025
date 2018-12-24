@@ -1,0 +1,55 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+using namespace std;
+const int MAXN=110;
+struct Student {
+	string id;
+	int score,local,local_rank,all_rank;
+};
+bool cmp(Student a,Student b) {
+	if(a.score!=b.score) return a.score>b.score;
+	else return a.id<b.id;
+}
+int main() {
+	int n,k,score;
+	vector<Student> stu[MAXN];
+	vector<Student> ans;
+	scanf("%d",&n);
+	string id;
+	for(int i=0; i<n; i++) {
+		scanf("%d",&k);
+		for(int j=0; j<k; j++) {
+			cin>>id>>score;
+			stu[i].push_back(Student {id,score,i+1,-1,-1});
+		}
+		sort(stu[i].begin(),stu[i].end(),cmp);
+		stu[i][0].local_rank=1;
+		ans.push_back(stu[i][0]);
+		for(int j=1; j<stu[i].size(); j++) {
+			if(stu[i][j].score==stu[i][j-1].score) stu[i][j].local_rank=stu[i][j-1].local_rank;
+			else stu[i][j].local_rank=j+1;
+			ans.push_back(stu[i][j]);
+		}
+	}
+	sort(ans.begin(),ans.end(),cmp);
+	printf("%d\n",ans.size());
+	ans[0].all_rank=1;
+	for(int i=0; i<ans.size(); i++) {
+		if(i==0) {
+			cout<<ans[i].id<<" "<<ans[i].all_rank<<" "<<ans[i].local<<" "<<ans[i].local_rank<<endl;
+		} else {
+			if(ans[i].score==ans[i-1].score) {
+				cout<<ans[i].id<<" "<<ans[i-1].all_rank<<" "<<ans[i].local<<" "<<ans[i].local_rank<<endl;
+				ans[i].all_rank=ans[i-1].all_rank;
+			} else {
+				cout<<ans[i].id<<" "<<i+1<<" "<<ans[i].local<<" "<<ans[i].local_rank<<endl;
+				ans[i].all_rank=i+1;
+			}
+		}
+
+	}
+	return 0;
+}
+
