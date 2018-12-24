@@ -1,0 +1,38 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+const int MAXV=1010;
+bool vist[MAXV];
+vector<int> G[MAXV];
+int q;//q代表将要被占领的城市
+void dfs(int v) {
+	vist[v]=true;
+	for(int i=0; i<G[v].size(); i++) {
+		if(!vist[G[v][i]]&&G[v][i]!=q) {//如果当前城市没有被访问过，并且不是被占领的城市则继续遍历
+			dfs(G[v][i]);
+		}
+	}
+}
+int main() {
+	int n,m,k,a,b;
+	scanf("%d%d%d",&n,&m,&k);
+	for(int i=0; i<m; i++) {
+		scanf("%d%d",&a,&b);
+		G[a].push_back(b);
+		G[b].push_back(a);
+	}
+	for(int i=0; i<k; i++) {
+		fill(vist,vist+MAXV,false);
+		scanf("%d",&q);
+		int cnt=0;
+		for(int i=1; i<=n; i++) {
+			if(!vist[i]&&i!=q) {
+				dfs(i);
+				cnt++;//计算图的连通分量个数
+			}
+		}
+		if(cnt>1) printf("%d\n",cnt-1);连通分量大于2个的时候，若有2个连通分量 则需要增加一条城市间线路，把2个连通分量成一个 若n个连通分量则需n-1条
+		else printf("0\n");//如果说连通分量是少于2个的话 则说明整个图是连通的 不需要增加城市之间的线路了
+	}
+	return 0;
+}
