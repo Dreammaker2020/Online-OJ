@@ -1,0 +1,42 @@
+#include <iostream>
+#include <queue>
+#include <vector>
+using namespace std;
+struct Node {
+	int layer;
+	vector<int> child;
+} node[110];
+int HashTable[110]= {0},maxLayer=-1;
+void BFS(int root) {//利用BFS遍历把每一层叶子结点数量计算出来
+	queue<int> q;
+	node[root].layer=1;设置根结点的层数
+	q.push(root);
+	while(!q.empty()) {
+		int now=q.front();
+		if(node[now].child.size()==0) HashTable[node[now].layer]++;//用数组保存每一层叶子结点的个数
+		if(node[now].layer>maxLayer) maxLayer=node[now].layer;//保存下整棵树的最大高度
+		q.pop();
+		for(int i=0; i<node[now].child.size(); i++) {
+			node[node[now].child[i]].layer=node[now].layer+1;//在遍历到当前结点的孩子结点的时候把其高度置为当前结点高度H+1
+			q.push(node[now].child[i]);
+		}
+	}
+}
+int main() {
+	int n,m,id,k,childId;
+	scanf("%d%d",&n,&m);
+	if(n==0) return 0;
+	for(int i=0; i<m; i++) {
+		scanf("%d%d",&id,&k);
+		for(int j=0; j<k; j++) {
+			scanf("%d",&childId);
+			node[id].child.push_back(childId);
+		}
+	}
+	BFS(1);
+	printf("%d",HashTable[1]);
+	for(int i=2; i<=maxLayer; i++) {//遍历完毕后输出每一层所包含的叶子结点数量
+		printf(" %d",HashTable[i]);
+	}
+	return 0;
+}
