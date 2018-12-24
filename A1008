@@ -1,0 +1,15 @@
+ #include <iostream>
+
+int main() {
+	int n,a,b,ans=0;
+	scanf("%d%d",&n,&a);
+	ans=a*6+5;
+	for(int i=1; i<n; i++) {
+		scanf("%d",&b);
+		if(b>a) ans+=(b-a)*6+5;
+		else ans+=(a-b)*4+5;
+		a=b;
+	}
+	printf("%d\n",ans);
+	return 0;
+}
