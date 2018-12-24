@@ -1,0 +1,58 @@
+/*
+题解：这道题有2种基本做法，第一种是采用并查集的做法，但是博主个人因为嫌弃并查集代码会多一点，使用了DFS的做法，并查集才是解决这类题的好办法，
+这里讲一下用DFS怎么做，首先用DFS遍历一次树，把树种最深的结点保存下来，然后再随便从保存下来最深的结点种选出一个结点作为根结点，再遍历一次，
+再次保存下来最深的结点，把2次深度遍历保存下来的最深结点去重，也就是用set保存即可，得出来的就是题目所要求的这课树能够构成的所有的最深深度结点。
+具体证明可以祥见算法导论亦或是晴神宝典。
+*/
+#include <iostream>
+#include <set>
+#include <vector>
+using namespace std;
+const int MAXV=10010;
+bool vist[MAXV]= {false};
+vector<int> G[MAXV],r1;
+set<int> res;
+int maxHigh;
+void DFS(int v,int high) {
+	vist[v]=true;
+	if(high>maxHigh) {
+		maxHigh=high;
+		r1.clear();
+		r1.push_back(v);
+	} else if(high==maxHigh) {
+		r1.push_back(v);
+	}
+	for(int i=0; i<G[v].size(); i++) {
+		if(!vist[G[v][i]]) {
+			DFS(G[v][i],high+1);
+		}
+	}
+}
+int main() {
+	int n,a,b;
+	scanf("%d",&n);
+	for(int i=0; i<n-1; i++) {
+		scanf("%d%d",&a,&b);
+		G[a].push_back(b);
+		G[b].push_back(a);
+	}
+	int cnt=0;
+	for(int i=1; i<=n; i++) {
+		maxHigh=-1;
+		if(!vist[i]) {
+			cnt++;
+			DFS(i,1);
+		}
+	}
+	if(cnt==1) {
+		fill(vist,vist+MAXV,0);
+		for(int i=0; i<r1.size(); i++) res.insert(r1[i]);
+		DFS(r1[0],1);
+		for(int i=0; i<r1.size(); i++) res.insert(r1[i]);
+		for(set<int>::iterator it=res.begin(); it!=res.end(); it++) {
+			printf("%d\n",*it);
+		}
+	} else printf("Error: %d components\n",cnt);
+
+	return 0;
+}
