@@ -1,0 +1,22 @@
+#include <iostream>
+char tag[3]= {'W','T','L'};
+int main() {
+	int n=3,maxIndex,cnt=0,t[3];
+	double data,maxNum,ans=1.0;
+	while(n) {
+		maxNum=-1;
+		for(int i=0; i<3; i++) {
+			scanf("%lf",&data);
+			if(data>maxNum) {
+				maxNum=data;
+				maxIndex=i;
+			}
+		}
+		ans*=maxNum;
+		t[cnt++]=maxIndex;
+		n--;
+	}
+	for(int i=0; i<3; i++) printf("%c ",tag[t[i]]);
+	printf("%.2f\n",(ans*0.65-1)*2);
+	return 0;
+}
