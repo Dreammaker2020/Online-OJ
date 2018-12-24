@@ -1,0 +1,72 @@
+#include <iostream>
+#include <vector>
+#include <map>
+#include <algorithm>
+#include <cmath>
+using namespace std;
+const int MAXN=2020;
+struct Person {
+	int id,grade[5],allRank[5];
+	int bestRank,courseId;
+} stu[MAXN];
+map<int,int> mp;
+int flag;
+bool cmp(Person a,Person b) {
+	return a.grade[flag]>b.grade[flag];
+}//根据flag的数字  来对结构体内对应的学生某项成绩进行排序
+int main() {
+	int n,m,id,C,MATH,ENG,query;
+	scanf("%d%d",&n,&m);
+	for(int i=0; i<n; i++) {
+		scanf("%d",&id);
+		scanf("%d%d%d",&C,&MATH,&ENG);
+		stu[i].id=id;
+		int avg=(int)round((C+MATH+ENG)*1.0/3);
+		stu[i].grade[0]=avg;
+		stu[i].grade[1]=C;
+		stu[i].grade[2]=MATH;
+		stu[i].grade[3]=ENG;
+	}
+	for(int i=0; i<4; i++) {
+		flag=i;
+		sort(stu,stu+n,cmp);
+		stu[0].allRank[i]=1;
+		for(int j=1; j<n; j++) {
+			if(i==4) {
+				int id=stu[i].id,maxRank=0x3fffffff;
+				mp[id]=i;
+				for(int j=0; j<4; j++) {
+					if(stu[i].allRank[j]<maxRank) {
+						maxRank=stu[i].allRank[j];
+						stu[i].courseId=j;
+						stu[i].bestRank=maxRank;
+					}
+				}
+			}
+			if(stu[j].grade[i]==stu[j-1].grade[i]) {
+				stu[j].allRank[i]=stu[j-1].allRank[i];
+			} else stu[j].allRank[i]=j+1;
+		}
+	}
+	for(int i=0; i<n; i++) {
+		int id=stu[i].id,maxRank=0x3fffffff;
+		mp[id]=i;
+		for(int j=0; j<4; j++) {//设置排名
+			if(stu[i].allRank[j]<maxRank) {
+				maxRank=stu[i].allRank[j];
+				stu[i].courseId=j;
+				stu[i].bestRank=maxRank;
+			}
+		}
+	}
+	char print[4]= {'A','C','M','E'};
+	for(int i=0; i<m; i++) {
+		scanf("%d",&query);
+		if(mp.count(query)==0) {
+			printf("N/A\n");
+			continue;
+		}
+		printf("%d %c\n",stu[mp[query]].bestRank,print[stu[mp[query]].courseId]);
+	}
+	return 0;
+}
