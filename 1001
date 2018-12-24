@@ -1,0 +1,27 @@
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+int data1,data2,flag=0;
+int main() {
+	scanf("%d%d",&data1,&data2);
+	if(data1+data2<0) flag=1;
+	string ans=to_string(abs(data1+data2));
+	int rest=ans.length()%3,cnt=0;
+	if(flag) printf("-");
+	while(rest&&ans.length()>3) {
+		printf("%c",ans[cnt++]);
+		rest--;
+		if(rest==0) printf(",");
+	}
+	int count=0;
+	for(int i=cnt; i<ans.length(); i++) {
+		printf("%c",ans[i]);
+		count++;
+		if(count==3&&i!=ans.length()-1) {
+			printf(",");
+			count=0;
+		}
+	}
+	return 0;
+}
