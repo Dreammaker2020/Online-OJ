@@ -1,0 +1,55 @@
+#include <iostream>
+#include <queue>
+using namespace std;
+const int MAXN=50;
+int post[MAXN],in[MAXN];
+struct node {
+	int data;
+	node *lchild,*rchild;
+};
+node* newNode(int x) {//构建新的一个结点
+	node *root=new node;
+	root->data=x;
+	root->lchild=root->rchild=NULL;
+	return root;
+}
+node* create(int postL,int postR,int inL,int inR) {//构造二叉树
+	if(postL>postR) return NULL;
+	node *root=newNode(post[postR]);
+	int k;
+	for(k=inL; k<=inR; k++) {
+		if(root->data==in[k]) {
+			break;
+		}
+	}
+	int leftNodeNum=k-inL;//求出当前根结点所划分出来的左孩子结点个数
+	root->lchild=create(postL,postL+leftNodeNum-1,inL,k-1);//根据序列划分 做这样的题目可以自己手写2个序列划分一下 很容易
+	root->rchild=create(postL+leftNodeNum,postR-1,k+1,inR);
+	return root;
+}
+int n,cnt=0;
+void BFS(node *root) {//遍历操作很容易
+	queue<node*> q;
+	q.push(root);
+	while(!q.empty()) {
+		node *now=q.front();
+		q.pop();
+		printf("%d",now->data);
+		cnt++;
+		if(cnt<n) printf(" ");
+		if(now->lchild!=NULL) q.push(now->lchild);
+		if(now->rchild!=NULL) q.push(now->rchild);
+	}
+}
+int main() {
+	scanf("%d",&n);
+	for(int i=0; i<n; i++) {
+		scanf("%d",&post[i]);
+	}
+	for(int i=0; i<n; i++) {
+		scanf("%d",&in[i]);
+	}
+	node *root=create(0,n-1,0,n-1);
+	BFS(root);
+	return 0;
+}
