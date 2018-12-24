@@ -1,0 +1,38 @@
+#include <iostream>
+#include <cstring>
+#include <algorithm>
+using namespace std;
+int main() {
+	string val,val2;
+	int hash1[10]= {0},hash2[10]= {0};
+	cin>>val;
+	reverse(val.begin(),val.end());
+	int carry=0;
+	for(int i=0; i<val.length(); i++) {
+		int num=val[i]-'0';
+		num*=2;
+		int rest=num%10+carry;
+		carry=num/10;
+		val2+=rest+'0';
+	}
+	if(carry!=0) val2+=carry+'0';
+	reverse(val2.begin(),val2.end());
+	reverse(val.begin(),val.end());
+	if(val.length()!=val2.length()) {//如果2个数据长度不一样 说明每个数里面的阿拉伯数字出现次数肯定不同
+		printf("No\n");
+	} else {
+		for(int i=0; i<val.length(); i++) hash1[val[i]-'0']++;//用数组保存下原来的所有数据里的每个数出现的次数
+		for(int i=0; i<val2.length(); i++) hash2[val2[i]-'0']++;//保存*2之后数据里每个数出现的次数
+		bool flag=true;
+		for(int i=0; i<10; i++) {
+			if(hash1[i]!=hash2[i]) {//若2组数据的某个数出现次数不一样时
+				printf("No\n");
+				flag=false;
+				break;
+			}
+		}
+		if(flag) printf("Yes\n");
+	}
+	cout<<val2<<endl;
+	return 0;
+}
